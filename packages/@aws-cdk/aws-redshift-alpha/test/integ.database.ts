@@ -59,6 +59,14 @@ const table = new redshift.Table(stack, 'Table', {
 });
 table.grant(user, redshift.TableAction.INSERT, redshift.TableAction.DELETE);
 
+const userWithAdminUser = new redshift.User(stack, 'User', {
+  ...databaseOptions,	
+  adminUser: cluster.secret,
+});
+cluster.addRotationMultiUser('UserRotation', {
+  secret: userWithAdminUser.secret,
+});
+
 new integ.IntegTest(app, 'redshift-cluster-database-integ', {
   testCases: [stack],
 });
